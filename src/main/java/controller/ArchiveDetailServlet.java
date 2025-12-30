@@ -29,6 +29,16 @@ public class ArchiveDetailServlet extends HttpServlet {
         // 返回结果
         String archiveStr = JSON.toJSONString(archive);
         resp.getWriter().write(archiveStr);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 设置编码
+        req.setCharacterEncoding("utf-8");
+
+        // 从隐藏域input拿到archiveCode，如果为空那就新增档案，如果有值那就是修改模式
+        String archiveCode = req.getParameter("id");
+
 
     }
 }

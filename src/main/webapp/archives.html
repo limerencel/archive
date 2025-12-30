@@ -391,31 +391,36 @@
                         alert("获取档案详情失败！");
                     }
                 })
-
-                if (archive) {
-
-                }
             });
 
             // 编辑档案
             $(document).on('click', '.edit-btn', function() {
                 const id = $(this).data('id');
-                const archive = archivesData.find(a => a.id === id);
-                
-                if (archive) {
-                    // 填充表单数据
-                    $('#archiveId').val(archive.id);
-                    $('#archiveCode').val(archive.id).prop('disabled', false);
-                    $('#archiveTitle').val(archive.title).prop('disabled', false);
-                    $('#archiveCategory').val(getCategoryValue(archive.category)).prop('disabled', false);
-                    $('#archiveStatus').val(archive.status).prop('disabled', false);
-                    $('#archiveUploader').val(archive.uploader).prop('disabled', false);
-                    $('#archiveDescription').val('这是' + archive.title + '的详细描述信息...').prop('disabled', false);
-                    
-                    $('#archiveModalLabel').text('编辑档案');
-                    $('#saveArchiveBtn').show();
-                    $('#archiveModal').modal('show');
-                }
+
+                $.ajax({
+                    url: "/archiveDetail",
+                    type: "GET",
+                    data: {id: id},
+                    dataType: "json",
+                    success: function (archive) {
+                        // 填充表单数据
+                        $('#archiveId').val(archive.id);
+                        $('#archiveCode').val(archive.id).prop('disabled', false);
+                        $('#archiveTitle').val(archive.title).prop('disabled', false);
+                        $('#archiveCategory').val(getCategoryValue(archive.category)).prop('disabled', false);
+                        $('#archiveStatus').val(archive.status).prop('disabled', false);
+                        $('#archiveUploader').val(archive.uploader).prop('disabled', false);
+                        $('#archiveDescription').val('这是' + archive.title + '的详细描述信息...').prop('disabled', false);
+
+                        $('#archiveModalLabel').text('编辑档案');
+                        $('#saveArchiveBtn').show();
+                        $('#archiveModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        alert("获取档案详情失败！");
+                    }
+                })
             });
 
             // 获取分类对应的值
@@ -433,9 +438,9 @@
             // 保存档案
             $('#archiveForm').submit(function(e) {
                 e.preventDefault();
-                
-                const archiveId = $('#archiveId').val();
+
                 const formData = {
+                    id: $('#archiveId').val(),
                     code: $('#archiveCode').val(),
                     title: $('#archiveTitle').val(),
                     category: $('#archiveCategory').val(),
@@ -443,16 +448,20 @@
                     uploader: $('#archiveUploader').val(),
                     description: $('#archiveDescription').val()
                 };
-                
-                if (archiveId) {
-                    // 编辑模式
-                    console.log('更新档案：', formData);
-                    alert('档案更新成功！');
-                } else {
-                    // 新建模式
-                    console.log('新建档案：', formData);
-                    alert('档案创建成功！');
-                }
+
+                $.ajax({
+                    url: "/archiveDetail",
+                    type: "POST",
+                    data: formData, //不管archiveId在不在直接往后端传，后端在判断是新增模式还是修改模式
+                    dataType: "json",
+                    success: function (response) {
+                        alert("成功")
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        alert("获取档案详情失败！");
+                    }
+                })
                 
                 $('#archiveModal').modal('hide');
             });
