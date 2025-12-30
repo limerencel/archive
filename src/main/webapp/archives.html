@@ -248,26 +248,26 @@
     <script>
         $(document).ready(function() {
             //TODO 在这里直接GET从后端拿到JSON的档案数据，path为/archiveList
-
-
-            // 模拟档案数据
-            const archivesData = [
-                { id: 'ARC001', title: '2024年度财务报表', category: '财务档案', level: 'high', status: 'approved', uploader: '李四', date: '2024-12-20', files: ['财务报表.xlsx', '附件说明.pdf'] },
-                { id: 'ARC002', title: '员工入职档案-张三', category: '人事档案', level: 'medium', status: 'approved', uploader: '王五', date: '2024-12-19', files: ['入职申请表.doc'] },
-                { id: 'ARC003', title: '项目合作协议书', category: '合同档案', level: 'high', status: 'pending', uploader: '赵六', date: '2024-12-18', files: ['合作协议.pdf', '附件1.doc', '附件2.doc'] },
-                { id: 'ARC004', title: 'XX项目技术方案', category: '项目档案', level: 'medium', status: 'approved', uploader: '钱七', date: '2024-12-17', files: ['技术方案.pptx'] },
-                { id: 'ARC005', title: '会议纪要-2024Q4', category: '其他档案', level: 'low', status: 'approved', uploader: '孙八', date: '2024-12-16', files: ['会议纪要.doc', '会议照片.jpg'] },
-                { id: 'ARC006', title: '设备采购合同', category: '合同档案', level: 'high', status: 'pending', uploader: '周九', date: '2024-12-15', files: ['采购合同.pdf'] },
-                { id: 'ARC007', title: '员工培训记录', category: '人事档案', level: 'low', status: 'approved', uploader: '吴十', date: '2024-12-14', files: ['培训记录表.xlsx', '培训资料.pdf'] },
-                { id: 'ARC008', title: '年度审计报告', category: '财务档案', level: 'high', status: 'approved', uploader: '郑十一', date: '2024-12-13', files: ['审计报告.pdf', '数据明细.xlsx', '审计意见.doc'] }
-            ];
+            $.ajax({
+                url: "/archiveList",
+                type: "GET",
+                dataType: "json",
+                success: function(response) {
+                    // response已经是解析好的js Object了
+                    // 初始化加载数据
+                    renderArchives(response);
+                },
+                error: function (error) {
+                    alert(error)
+                }
+            })
 
             // 状态颜色映射
             const statusMap = {
-                'pending': { text: '待审核', class: 'warning' },
-                'approved': { text: '已归档', class: 'success' },
-                'rejected': { text: '已驳回', class: 'danger' },
-                'archived': { text: '已归档', class: 'info' }
+                0: { text: '待审核', class: 'warning' },
+                1: { text: '已归档', class: 'success' },
+                2: { text: '已驳回', class: 'danger' },
+                3: { text: '已归档', class: 'info' }
             };
 
             // 等级颜色映射
@@ -321,8 +321,6 @@
                 $('#archivesList').html(html);
             }
 
-            // 初始化加载数据
-            renderArchives(archivesData);
 
             // 退出登录
             $('#logoutBtn').click(function() {
@@ -367,6 +365,8 @@
             // 查看档案详情
             $(document).on('click', '.view-btn', function() {
                 const id = $(this).data('id');
+                //TODO 再次GET by ID获得单个archive，path为/archiveDetail，其中GET为获取并渲染数据，POST为修改数据后提交
+
                 const archive = archivesData.find(a => a.id === id);
                 
                 if (archive) {
