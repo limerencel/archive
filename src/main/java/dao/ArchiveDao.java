@@ -40,13 +40,13 @@ public class ArchiveDao {
     }
 
     public static Archive findArchiveById(Integer id) {
-        String sql = "SELECT a.*, u.name AS uploader_name FROM archive a LEFT JOIN user u ON a.user_id = u.id WHERE id = ?";
+        String sql = "SELECT a.*, u.name AS uploader_name FROM archive a LEFT JOIN user u ON a.user_id = u.id WHERE a.id = ?";
         try (Connection conn = DataSourceUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                String arhiveCode = rs.getString("archive_code");
+                String archiveCode = rs.getString("archive_code");
                 String title = rs.getString("title");
                 String category = rs.getString("category");
                 Integer status = rs.getInt("status");
@@ -55,7 +55,7 @@ public class ArchiveDao {
                 LocalDateTime updatedDate = rs.getObject("updated_date", LocalDateTime.class);
                 String content = rs.getString("content");
 
-                return new Archive(id, arhiveCode, title, category, status, uploader, createdDate, updatedDate, content);
+                return new Archive(id, archiveCode, title, category, status, uploader, createdDate, updatedDate, content);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
