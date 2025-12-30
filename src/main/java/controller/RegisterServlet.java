@@ -36,9 +36,9 @@ public class RegisterServlet extends HttpServlet {
         String jsonString = jsonBuffer.toString();
 
         // 使用Fastjson一键转换成Java对象
-        RegisterDTO registerDate = JSON.parseObject(jsonString, RegisterDTO.class);
+        RegisterDTO registerData = JSON.parseObject(jsonString, RegisterDTO.class);
 
-        //TODO 用registerDate.emailCode和正确的验证码比较
+        //TODO 用registerData.emailCode和正确的验证码比较
 
         // 获取当前时间
         LocalDateTime now = LocalDateTime.now();
@@ -46,11 +46,11 @@ public class RegisterServlet extends HttpServlet {
         // 创建实体类，准备入库
         User user = new User();
         // 手动搬数据
-        user.setName(registerDate.getName());
-        user.setEmail(registerDate.getEmail());
-        user.setNumber(registerDate.getPhoneNumber());
-        user.setPassword(registerDate.getPassword());
-        user.setUsername(registerDate.getUsername());
+        user.setName(registerData.getName());
+        user.setEmail(registerData.getEmail());
+        user.setNumber(registerData.getPhoneNumber());
+        user.setPassword(registerData.getPassword());
+        user.setUsername(registerData.getUsername());
         // 补充数据
         user.setRegisteredDate(now);
         user.setGender(0);
@@ -60,7 +60,7 @@ public class RegisterServlet extends HttpServlet {
         // 默认无bio
 
         // 直接使用对象
-        System.out.println("name: " + registerDate.getUsername());
+        System.out.println("name: " + registerData.getUsername());
 
         // 实际业务逻辑
         // 调用注册方法
