@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 档案馆管理系统</title>
+    <!-- Bootstrap CSS -->
+    <link href="./js/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="./js/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/jquery-3.6.0.min.js"></script>
+
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-card fade-in" style="max-width: 700px;">
+            <div class="auth-header">
+                <h2><i class="bi bi-person-plus"></i> 新用户注册</h2>
+                <p>加入档案馆管理系统</p>
+            </div>
+            <div class="auth-body">
+                <form id="registerForm">
+                    <div class="mb-3">
+                        <label for="regUsername" class="form-label">
+                            <i class="bi bi-person"></i> 用户名 <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="regUsername" placeholder="请输入用户名（3-20个字符）" required>
+                        <div class="form-text">用户名将作为您的登录凭证</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regEmail" class="form-label">
+                            <i class="bi bi-envelope"></i> 邮箱地址 <span class="text-danger">*</span>
+                        </label>
+                        <input type="email" class="form-control" id="regEmail" placeholder="请输入邮箱地址" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regEmailCode" class="form-label">
+                            <i class="bi bi-key"></i> 邮箱验证码 <span class="text-danger">*</span>
+                        </label>
+                        <div class="captcha-group">
+                            <input type="text" class="form-control" id="regEmailCode" placeholder="请输入验证码" required>
+                            <button type="button" class="btn btn-outline-primary" id="sendRegCode">
+                                发送验证码
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regPassword" class="form-label">
+                            <i class="bi bi-lock"></i> 密码 <span class="text-danger">*</span>
+                        </label>
+                        <input type="password" class="form-control" id="regPassword" placeholder="请输入密码（至少6位）" required>
+                        <div class="form-text">密码长度至少6位，建议包含字母和数字</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regPasswordConfirm" class="form-label">
+                            <i class="fas fa-lock"></i> 确认密码 <span class="text-danger">*</span>
+                        </label>
+                        <input type="password" class="form-control" id="regPasswordConfirm" placeholder="请再次输入密码" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regRealName" class="form-label">
+                            <i class="bi bi-person-vcard"></i> 真实姓名
+                        </label>
+                        <input type="text" class="form-control" id="regRealName" placeholder="请输入真实姓名">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regPhone" class="form-label">
+                            <i class="bi bi-telephone"></i> 联系电话
+                        </label>
+                        <input type="tel" class="form-control" id="regPhone" placeholder="请输入联系电话">
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="agreeTerms" required>
+                        <label class="form-check-label" for="agreeTerms">
+                            我已阅读并同意 <a href="#" class="text-primary">用户协议</a> 和 <a href="#" class="text-primary">隐私政策</a>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
+                        <i class="bi bi-person-plus"></i> 立即注册
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <p class="mb-0">已有账户？ <a href="login.html" class="text-primary">立即登录</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="./js/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="./js/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // 发送注册验证码
+            let countdown = 0;
+            $('#sendRegCode').click(function() {
+                const email = $('#regEmail').val();
+                
+                if (!email) {
+                    alert('请先输入邮箱地址！');
+                    $('#regEmail').focus();
+                    return;
+                }
+                
+                // 验证邮箱格式
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email)) {
+                    alert('邮箱格式不正确！');
+                    $('#regEmail').focus();
+                    return;
+                }
+                
+                if (countdown > 0) {
+                    return;
+                }
+                
+                // 模拟发送验证码
+                $(this).prop('disabled', true);
+                countdown = 60;
+                
+                const timer = setInterval(() => {
+                    countdown--;
+                    $('#sendRegCode').text(countdown + '秒后重发');
+                    
+                    if (countdown <= 0) {
+                        clearInterval(timer);
+                        $('#sendRegCode').prop('disabled', false).text('发送验证码');
+                    }
+                }, 1000);
+                
+                alert('验证码已发送到邮箱：' + email + '（模拟）');
+            });
+            
+            // 实时密码强度检测
+            $('#regPassword').on('input', function() {
+                const password = $(this).val();
+                const strength = checkPasswordStrength(password);
+                // 可以在这里添加密码强度显示
+            });
+            
+            // 检查密码强度
+            function checkPasswordStrength(password) {
+                let strength = 0;
+                if (password.length >= 6) strength++;
+                if (password.length >= 10) strength++;
+                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+                if (/\d/.test(password)) strength++;
+                if (/[^a-zA-Z0-9]/.test(password)) strength++;
+                return strength;
+            }
+            
+            // 注册表单提交
+            $('#registerForm').submit(function(e) {
+                e.preventDefault();
+                
+                const username = $('#regUsername').val().trim();
+                const email = $('#regEmail').val().trim();
+                const emailCode = $('#regEmailCode').val().trim();
+                const password = $('#regPassword').val();
+                const passwordConfirm = $('#regPasswordConfirm').val();
+                const realName = $('#regRealName').val().trim();
+                const phone = $('#regPhone').val().trim();
+                const agreeTerms = $('#agreeTerms').is(':checked');
+                
+                // 表单验证
+                if (username.length < 3 || username.length > 20) {
+                    alert('用户名长度应为3-20个字符！');
+                    $('#regUsername').focus();
+                    return;
+                }
+                
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email)) {
+                    alert('邮箱格式不正确！');
+                    $('#regEmail').focus();
+                    return;
+                }
+                
+                if (!emailCode) {
+                    alert('请输入邮箱验证码！');
+                    $('#regEmailCode').focus();
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    alert('密码长度至少为6位！');
+                    $('#regPassword').focus();
+                    return;
+                }
+                
+                if (password !== passwordConfirm) {
+                    alert('两次输入的密码不一致！');
+                    $('#regPasswordConfirm').focus();
+                    return;
+                }
+                
+                if (phone && !/^1[3-9]\d{9}$/.test(phone)) {
+                    alert('手机号格式不正确！');
+                    $('#regPhone').focus();
+                    return;
+                }
+                
+                if (!agreeTerms) {
+                    alert('请阅读并同意用户协议和隐私政策！');
+                    return;
+                }
+                
+                // 构建注册数据
+                const registerData = {
+                    username: username,
+                    email: email,
+                    emailCode: emailCode,
+                    password: password,
+                    realName: realName,
+                    phone: phone
+                };
+
+                $.ajax({
+                    url: "/register",
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(registerData),
+                    success: function(response) {
+                        let result = (typeof response === "string") ? JSON.parse(response) : response;
+                        if (result.success) {
+                            alert('注册成功！即将跳转到登录页面...');
+
+                            // 延迟跳转
+                            setTimeout(function() {
+                                window.location.href = 'login.html';
+                            }, 1000);
+                        } else {
+                            alert("something went wrong");
+                        }
+                    },
+                    error: function() {
+                        alert("something went wrong");
+                    }
+                })
+            });
+            
+            // 用户名实时验证
+            $('#regUsername').on('blur', function() {
+                const username = $(this).val().trim();
+                if (username.length > 0 && (username.length < 3 || username.length > 20)) {
+                    $(this).addClass('is-invalid');
+                } else if (username.length > 0) {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                }
+            });
+            
+            // 密码确认实时验证
+            $('#regPasswordConfirm').on('input', function() {
+                const password = $('#regPassword').val();
+                const confirmPassword = $(this).val();
+                
+                if (confirmPassword.length > 0) {
+                    if (password === confirmPassword) {
+                        $(this).removeClass('is-invalid').addClass('is-valid');
+                    } else {
+                        $(this).removeClass('is-valid').addClass('is-invalid');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>档案中心 - 档案馆管理系统</title>
+    <!-- Bootstrap CSS -->
+    <link href="./js/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="./js/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h3><i class="bi bi-archive"></i> 档案馆</h3>
+            <p>Archives Management System</p>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="profile.html">
+                    <i class="bi bi-person"></i>
+                    <span>个人中心</span>
+                </a>
+            </li>
+            <li>
+                <a href="archives.html" class="active">
+                    <i class="bi bi-folder2-open"></i>
+                    <span>档案中心</span>
+                </a>
+            </li>
+
+        </ul>
+        <div class="sidebar-footer">
+            <button class="btn-logout" id="logoutBtn">
+                <i class="bi bi-box-arrow-right"></i> 退出登录
+            </button>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <div class="content-header fade-in">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="bi bi-folder2-open"></i> 档案中心</h1>
+                    <p>管理和检索档案信息</p>
+                </div>
+                <button class="btn btn-primary" id="addArchiveBtn">
+                    <i class="bi bi-plus-lg"></i> 新建档案
+                </button>
+            </div>
+        </div>
+
+        <!-- 筛选区域 -->
+        <div class="custom-card fade-in">
+            <div class="custom-card-header">
+                <h3><i class="bi bi-funnel"></i> 筛选条件</h3>
+            </div>
+            <div class="filter-section">
+                <form id="filterForm">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="filterKeyword" class="form-label">关键词</label>
+                            <input type="text" class="form-control" id="filterKeyword" placeholder="档案标题、编号">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="filterCategory" class="form-label">档案分类</label>
+                            <select class="form-select" id="filterCategory">
+                                <option value="">全部分类</option>
+                                <option value="personnel">人事档案</option>
+                                <option value="financial">财务档案</option>
+                                <option value="contract">合同档案</option>
+                                <option value="project">项目档案</option>
+                                <option value="other">其他档案</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="filterStatus" class="form-label">档案状态</label>
+                            <select class="form-select" id="filterStatus">
+                                <option value="">全部状态</option>
+                                <option value="pending">待审核</option>
+                                <option value="approved">已归档</option>
+                                <option value="rejected">已驳回</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="filterUploader" class="form-label">上传人</label>
+                            <input type="text" class="form-control" id="filterUploader" placeholder="上传人姓名">
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" id="resetFilterBtn">
+                            <i class="bi bi-arrow-clockwise"></i> 重置
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> 搜索
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 档案列表 -->
+        <div class="custom-card fade-in mt-4">
+            <div class="custom-card-header d-flex justify-content-between align-items-center">
+                <h3><i class="bi bi-list-ul"></i> 档案列表</h3>
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary" id="gridViewBtn">
+                        <i class="bi bi-grid-3x3"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary active" id="listViewBtn">
+                        <i class="bi bi-list-ul"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" id="archivesTable">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll"></th>
+                            <th>档案编号</th>
+                            <th>档案标题</th>
+                            <th>分类</th>
+                            <th>状态</th>
+                            <th>档案文件</th>
+                            <th>上传人</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="archivesList">
+                        <!-- 档案数据将通过JS动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 分页 -->
+            <nav>
+                <ul class="pagination justify-content-center" id="pagination">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">上一页</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">下一页</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 档案编辑/查看弹窗 -->
+    <div class="modal fade" id="archiveModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="archiveModalLabel">新建档案</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="archiveForm">
+                        <input type="hidden" id="archiveId">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="archiveCode" class="form-label">
+                                    <i class="bi bi-upc-scan"></i> 档案编号 <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="archiveCode" placeholder="请输入档案编号" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="archiveTitle" class="form-label">
+                                    <i class="bi bi-type-h1"></i> 档案标题 <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="archiveTitle" placeholder="请输入档案标题" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="archiveCategory" class="form-label">
+                                    <i class="bi bi-folder"></i> 档案分类 <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="archiveCategory" required>
+                                    <option value="">请选择分类</option>
+                                    <option value="personnel">人事档案</option>
+                                    <option value="financial">财务档案</option>
+                                    <option value="contract">合同档案</option>
+                                    <option value="project">项目档案</option>
+                                    <option value="other">其他档案</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="archiveStatus" class="form-label">
+                                    <i class="bi bi-info-circle"></i> 档案状态 <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="archiveStatus" required>
+                                    <option value="">请选择状态</option>
+                                    <option value="pending">待审核</option>
+                                    <option value="approved">已归档</option>
+                                    <option value="rejected">已驳回</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="archiveUploader" class="form-label">
+                                    <i class="bi bi-person"></i> 上传人 <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="archiveUploader" placeholder="请输入上传人" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="archiveFile" class="form-label">
+                                    <i class="bi bi-cloud-upload"></i> 上传文件
+                                </label>
+                                <input type="file" class="form-control" id="archiveFile">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="archiveDescription" class="form-label">
+                                <i class="bi bi-text-left"></i> 档案描述
+                            </label>
+                            <textarea class="form-control" id="archiveDescription" rows="4" placeholder="请输入档案的详细描述"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> 关闭
+                    </button>
+                    <button type="submit" form="archiveForm" class="btn btn-primary" id="saveArchiveBtn">
+                        <i class="bi bi-save"></i> 保存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="./js/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="./js/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 模拟档案数据
+            const archivesData = [
+                { id: 'ARC001', title: '2024年度财务报表', category: '财务档案', level: 'high', status: 'approved', uploader: '李四', date: '2024-12-20', files: ['财务报表.xlsx', '附件说明.pdf'] },
+                { id: 'ARC002', title: '员工入职档案-张三', category: '人事档案', level: 'medium', status: 'approved', uploader: '王五', date: '2024-12-19', files: ['入职申请表.doc'] },
+                { id: 'ARC003', title: '项目合作协议书', category: '合同档案', level: 'high', status: 'pending', uploader: '赵六', date: '2024-12-18', files: ['合作协议.pdf', '附件1.doc', '附件2.doc'] },
+                { id: 'ARC004', title: 'XX项目技术方案', category: '项目档案', level: 'medium', status: 'approved', uploader: '钱七', date: '2024-12-17', files: ['技术方案.pptx'] },
+                { id: 'ARC005', title: '会议纪要-2024Q4', category: '其他档案', level: 'low', status: 'approved', uploader: '孙八', date: '2024-12-16', files: ['会议纪要.doc', '会议照片.jpg'] },
+                { id: 'ARC006', title: '设备采购合同', category: '合同档案', level: 'high', status: 'pending', uploader: '周九', date: '2024-12-15', files: ['采购合同.pdf'] },
+                { id: 'ARC007', title: '员工培训记录', category: '人事档案', level: 'low', status: 'approved', uploader: '吴十', date: '2024-12-14', files: ['培训记录表.xlsx', '培训资料.pdf'] },
+                { id: 'ARC008', title: '年度审计报告', category: '财务档案', level: 'high', status: 'approved', uploader: '郑十一', date: '2024-12-13', files: ['审计报告.pdf', '数据明细.xlsx', '审计意见.doc'] }
+            ];
+
+            // 状态颜色映射
+            const statusMap = {
+                'pending': { text: '待审核', class: 'warning' },
+                'approved': { text: '已归档', class: 'success' },
+                'rejected': { text: '已驳回', class: 'danger' },
+                'archived': { text: '已归档', class: 'info' }
+            };
+
+            // 等级颜色映射
+            const levelMap = {
+                'high': { text: '高', class: 'danger' },
+                'medium': { text: '中', class: 'warning' },
+                'low': { text: '低', class: 'info' }
+            };
+
+            // 渲染档案列表
+            function renderArchives(data) {
+                let html = '';
+                data.forEach(archive => {
+                    const status = statusMap[archive.status];
+                    
+                    // 生成文件列表HTML
+                    let filesHtml = '';
+                    if (archive.files && archive.files.length > 0) {
+                        filesHtml = `<span class="badge bg-secondary">${archive.files.length}个文件</span> `;
+                        filesHtml += `<button class="btn btn-sm btn-link p-0" onclick="showFiles('${archive.id}')" title="查看文件列表">
+                            <i class="bi bi-folder2-open"></i>
+                        </button>`;
+                    } else {
+                        filesHtml = '<span class="text-muted">无</span>';
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td><input type="checkbox" class="archive-checkbox" value="${archive.id}"></td>
+                            <td><strong>${archive.id}</strong></td>
+                            <td>${archive.title}</td>
+                            <td><span class="badge bg-primary">${archive.category}</span></td>
+                            <td><span class="badge bg-${status.class}">${status.text}</span></td>
+                            <td>${filesHtml}</td>
+                            <td>${archive.uploader}</td>
+                            <td>${archive.date}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info view-btn" data-id="${archive.id}">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning edit-btn" data-id="${archive.id}">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger delete-btn" data-id="${archive.id}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                $('#archivesList').html(html);
+            }
+
+            // 初始化加载数据
+            renderArchives(archivesData);
+
+            // 退出登录
+            $('#logoutBtn').click(function() {
+                if (confirm('确定要退出登录吗？')) {
+                    window.location.href = 'login.html';
+                }
+            });
+
+            // 新建档案
+            $('#addArchiveBtn').click(function() {
+                $('#archiveModalLabel').text('新建档案');
+                $('#archiveForm')[0].reset();
+                $('#archiveId').val('');
+                $('#archiveModal').modal('show');
+            });
+
+            // 筛选表单提交
+            $('#filterForm').submit(function(e) {
+                e.preventDefault();
+                const filters = {
+                    keyword: $('#filterKeyword').val(),
+                    category: $('#filterCategory').val(),
+                    status: $('#filterStatus').val(),
+                    uploader: $('#filterUploader').val()
+                };
+                
+                console.log('筛选条件：', filters);
+                alert('执行筛选操作（实际项目中会根据条件过滤数据）');
+            });
+
+            // 重置筛选
+            $('#resetFilterBtn').click(function() {
+                $('#filterForm')[0].reset();
+                renderArchives(archivesData);
+            });
+
+            // 全选/取消全选
+            $('#selectAll').change(function() {
+                $('.archive-checkbox').prop('checked', $(this).is(':checked'));
+            });
+
+            // 查看档案详情
+            $(document).on('click', '.view-btn', function() {
+                const id = $(this).data('id');
+                const archive = archivesData.find(a => a.id === id);
+                
+                if (archive) {
+                    // 填充表单数据
+                    $('#archiveId').val(archive.id);
+                    $('#archiveCode').val(archive.id).prop('disabled', true);
+                    $('#archiveTitle').val(archive.title).prop('disabled', true);
+                    $('#archiveCategory').val(getCategoryValue(archive.category)).prop('disabled', true);
+                    $('#archiveStatus').val(archive.status).prop('disabled', true);
+                    $('#archiveUploader').val(archive.uploader).prop('disabled', true);
+                    $('#archiveDescription').val('这是' + archive.title + '的详细描述信息...').prop('disabled', true);
+                    
+                    $('#archiveModalLabel').text('查看档案详情');
+                    $('#saveArchiveBtn').hide();
+                    $('#archiveModal').modal('show');
+                }
+            });
+
+            // 编辑档案
+            $(document).on('click', '.edit-btn', function() {
+                const id = $(this).data('id');
+                const archive = archivesData.find(a => a.id === id);
+                
+                if (archive) {
+                    // 填充表单数据
+                    $('#archiveId').val(archive.id);
+                    $('#archiveCode').val(archive.id).prop('disabled', false);
+                    $('#archiveTitle').val(archive.title).prop('disabled', false);
+                    $('#archiveCategory').val(getCategoryValue(archive.category)).prop('disabled', false);
+                    $('#archiveStatus').val(archive.status).prop('disabled', false);
+                    $('#archiveUploader').val(archive.uploader).prop('disabled', false);
+                    $('#archiveDescription').val('这是' + archive.title + '的详细描述信息...').prop('disabled', false);
+                    
+                    $('#archiveModalLabel').text('编辑档案');
+                    $('#saveArchiveBtn').show();
+                    $('#archiveModal').modal('show');
+                }
+            });
+
+            // 获取分类对应的值
+            function getCategoryValue(categoryName) {
+                const categoryMap = {
+                    '人事档案': 'personnel',
+                    '财务档案': 'financial',
+                    '合同档案': 'contract',
+                    '项目档案': 'project',
+                    '其他档案': 'other'
+                };
+                return categoryMap[categoryName] || '';
+            }
+
+            // 保存档案
+            $('#archiveForm').submit(function(e) {
+                e.preventDefault();
+                
+                const archiveId = $('#archiveId').val();
+                const formData = {
+                    code: $('#archiveCode').val(),
+                    title: $('#archiveTitle').val(),
+                    category: $('#archiveCategory').val(),
+                    status: $('#archiveStatus').val(),
+                    uploader: $('#archiveUploader').val(),
+                    description: $('#archiveDescription').val()
+                };
+                
+                if (archiveId) {
+                    // 编辑模式
+                    console.log('更新档案：', formData);
+                    alert('档案更新成功！');
+                } else {
+                    // 新建模式
+                    console.log('新建档案：', formData);
+                    alert('档案创建成功！');
+                }
+                
+                $('#archiveModal').modal('hide');
+            });
+
+            // 删除档案
+            $(document).on('click', '.delete-btn', function() {
+                const id = $(this).data('id');
+                if (confirm('确定要删除档案 ' + id + ' 吗？')) {
+                    alert('档案已删除');
+                    $(this).closest('tr').fadeOut();
+                }
+            });
+
+            // 视图切换
+            $('#gridViewBtn').click(function() {
+                $(this).addClass('active');
+                $('#listViewBtn').removeClass('active');
+                alert('切换到网格视图（需要实现不同的布局）');
+            });
+
+            $('#listViewBtn').click(function() {
+                $(this).addClass('active');
+                $('#gridViewBtn').removeClass('active');
+            });
+            
+            // 显示文件列表
+            window.showFiles = function(archiveId) {
+                const archive = archivesData.find(a => a.id === archiveId);
+                if (archive && archive.files) {
+                    let fileList = archive.files.map((file, index) => 
+                        `${index + 1}. ${file}`
+                    ).join('\n');
+                    alert(`档案编号：${archive.id}
+档案标题：${archive.title}
+
+文件列表：
+${fileList}`);
+                }
+            };
+        });
+    </script>
+</body>
+</html>

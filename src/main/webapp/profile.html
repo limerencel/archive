@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 档案馆管理系统</title>
+    <!-- Bootstrap CSS -->
+    <link href="./js/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="./js/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h3><i class="bi bi-archive"></i> 档案馆</h3>
+            <p>Archives Management System</p>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="profile.html" class="active">
+                    <i class="bi bi-person"></i>
+                    <span>个人中心</span>
+                </a>
+            </li>
+            <li>
+                <a href="archives.html">
+                    <i class="bi bi-folder2-open"></i>
+                    <span>档案中心</span>
+                </a>
+            </li>
+
+        </ul>
+        <div class="sidebar-footer">
+            <button class="btn-logout" id="logoutBtn">
+                <i class="bi bi-box-arrow-right"></i> 退出登录
+            </button>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <div class="content-header fade-in">
+            <h1><i class="bi bi-person-circle"></i> 个人中心</h1>
+            <p>管理您的个人信息和账户设置</p>
+        </div>
+
+        <div class="row">
+            <!-- 用户信息卡片 -->
+            <div class="col-md-4">
+                <div class="custom-card fade-in">
+                    <div class="text-center">
+                        <img src="https://picsum.photos/100/100?random=10" alt="用户头像" class="user-avatar mb-3">
+                        <h4 id="userName">张三</h4>
+                        <p class="text-muted" id="userRole">档案管理员</p>
+                        <button class="btn btn-outline-primary btn-sm" id="changeAvatarBtn">
+                            <i class="bi bi-camera"></i> 更换头像
+                        </button>
+                    </div>
+                    <hr class="my-4">
+                    <div class="mb-3">
+                        <small class="text-muted">注册时间</small>
+                        <p class="mb-0" id="regTime">2024-01-15</p>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">上次登录</small>
+                        <p class="mb-0" id="lastLogin">2024-12-23 10:30:25</p>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">账户状态</small>
+                        <p class="mb-0"><span class="badge bg-success">正常</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 详细信息 -->
+            <div class="col-md-8">
+                <div class="custom-card fade-in">
+                    <div class="custom-card-header">
+                        <h3><i class="bi bi-info-circle"></i> 基本信息</h3>
+                    </div>
+                    <div class="p-3">
+                            <form id="profileForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="profileUsername" class="form-label">
+                                            <i class="fas fa-user"></i> 用户名
+                                        </label>
+                                        <input type="text" class="form-control" id="profileUsername" value="zhangsan" disabled>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="profileRealName" class="form-label">
+                                            <i class="bi bi-person-vcard"></i> 真实姓名
+                                        </label>
+                                        <input type="text" class="form-control" id="profileRealName" value="张三">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="profileEmail" class="form-label">
+                                            <i class="bi bi-envelope"></i> 邮箱地址
+                                        </label>
+                                        <input type="email" class="form-control" id="profileEmail" value="zhangsan@example.com">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="profilePhone" class="form-label">
+                                            <i class="bi bi-telephone"></i> 联系电话
+                                        </label>
+                                        <input type="tel" class="form-control" id="profilePhone" value="13800138000">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="profileGender" class="form-label">
+                                            <i class="bi bi-gender-ambiguous"></i> 性别
+                                        </label>
+                                        <select class="form-select" id="profileGender">
+                                            <option value="1" selected>男</option>
+                                            <option value="2">女</option>
+                                            <option value="0">未知</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="profileBio" class="form-label">
+                                        <i class="bi bi-sticky"></i> 个人简介
+                                    </label>
+                                    <textarea class="form-control" id="profileBio" rows="3">负责档案的整理、归档和查询工作...</textarea>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-save"></i> 保存修改
+                                    </button>
+                                </div>
+                            </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="./js/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="./js/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // 退出登录
+            $('#logoutBtn').click(function() {
+                if (confirm('确定要退出登录吗？')) {
+                    alert('已退出登录！');
+                    window.location.href = 'login.html';
+                }
+            });
+
+            // 更换头像
+            $('#changeAvatarBtn').click(function() {
+                const randomNum = Math.floor(Math.random() * 100);
+                $('.user-avatar').attr('src', `https://picsum.photos/100/100?random=${randomNum}`);
+                alert('头像已更换！（实际项目中需要上传图片）');
+            });
+
+            // 保存个人信息
+            $('#profileForm').submit(function(e) {
+                e.preventDefault();
+                
+                const data = {
+                    realName: $('#profileRealName').val(),
+                    email: $('#profileEmail').val(),
+                    phone: $('#profilePhone').val(),
+                    gender: $('#profileGender').val(),
+                    dept: $('#profileDept').val(),
+                    bio: $('#profileBio').val()
+                };
+                
+                console.log('保存个人信息：', data);
+                alert('个人信息保存成功！');
+            });
+
+
+        });
+    </script>
+</body>
+</html>
