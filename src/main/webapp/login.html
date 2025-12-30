@@ -42,13 +42,13 @@
                                 <label for="username" class="form-label">
                                     <i class="bi bi-person"></i> 用户名
                                 </label>
-                                <input type="text" class="form-control" id="username" placeholder="请输入用户名" required>
+                                <input type="text" class="form-control" id="username" placeholder="请输入用户名" name="username" required>
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">
                                     <i class="bi bi-lock"></i> 密码
                                 </label>
-                                <input type="password" class="form-control" id="password" placeholder="请输入密码" required>
+                                <input type="password" class="form-control" id="password" placeholder="请输入密码" name="password" required>
                             </div>
                             <div class="mb-3">
                                 <label for="captcha" class="form-label">
@@ -172,12 +172,29 @@
                     $('#captcha').val('');
                     return;
                 }
-                
-                // 模拟登录（实际项目中应该发送到服务器验证）
-                if (username && password) {
-                    alert('登录成功！');
-                    window.location.href = 'profile.html';
+
+                const loginDate = {
+                    username,
+                    password
                 }
+
+                $.ajax({
+                    url: "/login",
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(loginDate),
+                    success: function(response) {
+                        let result = (typeof response === "string") ? JSON.parse(response) : response;
+                        if (result.success) {
+                                window.location.href = 'archives.html';
+                        } else {
+                            alert(result.message);
+                        }
+                    },
+                    error: function() {
+                        alert("something went wrong");
+                    }
+                })
             });
             
             // 发送邮箱验证码

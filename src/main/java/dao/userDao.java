@@ -5,7 +5,9 @@ import utils.DataSourceUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class userDao {
     public static void register(User user) {
@@ -26,5 +28,34 @@ public class userDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static User findUserByUsername(String username) {
+        String sql = "SELECT * FROM user WHERE username = ?";
+        try (Connection conn = DataSourceUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String password = rs.getString("password");
+                String email = rs.getString("email");
+                String number = rs.getString("number");
+                Integer gender = rs.getInt("gender");
+                LocalDateTime registeredDate = rs.getObject("registered_date", LocalDateTime.class);
+                LocalDateTime lastLoginDate = rs.getObject("last_login_date", LocalDateTime.class);
+                Integer status = rs.getInt("status");
+                String bio = rs.getString("bio");
+                String pic = rs.getString("pic");
+                String role = rs.getString("bio");
+
+                return new User(id, username,name,password,email,number,gender,registeredDate,lastLoginDate,status,bio,pic,role);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 }
