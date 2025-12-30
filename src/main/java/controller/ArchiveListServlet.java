@@ -28,5 +28,6 @@ public class ArchiveListServlet extends HttpServlet {
         String archiveListJson = JSON.toJSONString(archiveList);
         resp.getWriter().write(archiveListJson);
 
+        System.out.println(archiveListJson);
     }
 }

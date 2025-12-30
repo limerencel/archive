@@ -9,4 +9,8 @@ public class ArchiveService {
     public List<Archive> findAllArchives() {
         return ArchiveDao.findAllArchives();
     }
+
+    public Archive findArchiveById(Integer id) {
+        return ArchiveDao.findArchiveById(id);
+    }
 }
