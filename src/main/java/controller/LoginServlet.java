@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -42,8 +43,13 @@ public class LoginServlet extends HttpServlet {
 
         User user = userService.findUserByUsername(username);
 
+        // 获取当前时间
+        LocalDateTime now = LocalDateTime.now();
+
         if (user != null && password.equals(user.getPassword())) {
             // 登陆成功
+            // 更新登录时间
+            userService.updateLoginDate(user.getUsername(), now);
             session.setAttribute("loginUser", user);
             resp.getWriter().write("{\"success\": true, \"message\": \"login successfully\"}");
         } else {

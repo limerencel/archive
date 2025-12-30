@@ -58,4 +58,17 @@ public class userDao {
         }
         return null;
     }
+
+    public static void updateLoginDate(String username, LocalDateTime loginTime) {
+        String sql = "UPDATE user SET last_login_date = ? WHERE username = ?";
+
+        try (Connection conn = DataSourceUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, loginTime);
+            ps.setString(2, username);
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
