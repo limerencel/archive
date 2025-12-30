@@ -10,7 +10,7 @@ public class ArchiveService {
         return ArchiveDao.findAllArchives();
     }
 
-    public Archive findArchiveById(Integer id) {
+    public Archive findArchiveById(String id) {
         return ArchiveDao.findArchiveById(id);
     }
 }

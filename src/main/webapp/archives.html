@@ -367,21 +367,33 @@
                 const id = $(this).data('id');
                 //TODO 再次GET by ID获得单个archive，path为/archiveDetail，其中GET为获取并渲染数据，POST为修改数据后提交
 
-                const archive = archivesData.find(a => a.id === id);
-                
+                $.ajax({
+                    url: "/archiveDetail",
+                    type: "GET",
+                    data: {id: id},
+                    dataType: "json",
+                    success: function (archive) {
+                        // 填充表单数据
+                        $('#archiveId').val(archive.id);
+                        $('#archiveCode').val(archive.id).prop('disabled', true);
+                        $('#archiveTitle').val(archive.title).prop('disabled', true);
+                        $('#archiveCategory').val(getCategoryValue(archive.category)).prop('disabled', true);
+                        $('#archiveStatus').val(archive.status).prop('disabled', true);
+                        $('#archiveUploader').val(archive.uploader).prop('disabled', true);
+                        $('#archiveDescription').val('这是' + archive.title + '的详细描述信息...').prop('disabled', true);
+
+                        $('#archiveModalLabel').text('查看档案详情');
+                        $('#saveArchiveBtn').hide();
+                        $('#archiveModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        alert("获取档案详情失败！");
+                    }
+                })
+
                 if (archive) {
-                    // 填充表单数据
-                    $('#archiveId').val(archive.id);
-                    $('#archiveCode').val(archive.id).prop('disabled', true);
-                    $('#archiveTitle').val(archive.title).prop('disabled', true);
-                    $('#archiveCategory').val(getCategoryValue(archive.category)).prop('disabled', true);
-                    $('#archiveStatus').val(archive.status).prop('disabled', true);
-                    $('#archiveUploader').val(archive.uploader).prop('disabled', true);
-                    $('#archiveDescription').val('这是' + archive.title + '的详细描述信息...').prop('disabled', true);
-                    
-                    $('#archiveModalLabel').text('查看档案详情');
-                    $('#saveArchiveBtn').hide();
-                    $('#archiveModal').modal('show');
+
                 }
             });
 

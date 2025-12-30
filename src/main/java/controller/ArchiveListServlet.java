@@ -27,7 +27,5 @@ public class ArchiveListServlet extends HttpServlet {
         // 转化成JSON字符串返回给前端
         String archiveListJson = JSON.toJSONString(archiveList);
         resp.getWriter().write(archiveListJson);
-
-        System.out.println(archiveListJson);
     }
 }
