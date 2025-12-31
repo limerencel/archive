@@ -57,6 +57,8 @@ public class ArchiveDetailServlet extends HttpServlet {
         archive.setUploader(name);
         archive.setUserId(id);
 
+        System.out.println("uploaded url: " + req.getParameter("uploadedUrls"));
+
         // get current date
         LocalDateTime now = LocalDateTime.now();
 

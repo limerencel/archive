@@ -167,6 +167,7 @@
                 <div class="modal-body">
                     <form id="archiveForm">
                         <input type="hidden" id="archiveId">
+                        <input type="hidden" id="filePathsJson" name="filePaths">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="archiveCode" class="form-label">
@@ -246,6 +247,7 @@
     <!-- Bootstrap JS -->
     <script src="./js/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        let allUploadedFiles = [];
 
         $(document).ready(function() {
             let allArchivesData = []; // 存储所有数据
@@ -552,7 +554,8 @@
                     category: $('#archiveCategory').val(),
                     status: $('#archiveStatus').val(),
                     uploader: $('#archiveUploader').val(),
-                    description: $('#archiveDescription').val()
+                    description: $('#archiveDescription').val(),
+                    uploadedUrls: $("#filePaths").val()
                 };
 
                 $.ajax({
@@ -614,6 +617,39 @@
                     alert(`档案编号：${archive.id}\n档案标题：${archive.title}\n\n文件列表：\n${fileList}`);
                 }
             };
+
+            // 上传文件
+            $("#archiveFile").change(function () {
+                // 获取文件对象
+                const files = this.files;
+                if (!files || files.length === 0) return;
+                // 打包FormDate
+                const formData = new FormData();
+                for (let i = 0; i < files.length; i++) {
+                    formData.append('files', files[i]);
+                }
+                $.ajax({
+                    url: "/uploadFile",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (res) {
+                        if (res.success) {
+                            // 获得上传文件的虚拟路径
+                            // 把新文件添加到数组里
+                            allUploadedFiles = allUploadedFiles.concat(res.url)
+
+                            // 转化成JSON储存到隐藏域
+                            $("#filePaths").val(JSON.stringify(allUploadedFiles));
+                        }
+                        alert("上传成功")
+                    },
+                    error: function () {
+                        alert("上传失败")
+                    }
+                })
+            })
         });
     </script>
 </body>
