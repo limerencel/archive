@@ -10,7 +10,20 @@ public class ArchiveService {
         return ArchiveDao.findAllArchives();
     }
 
-    public Archive findArchiveById(String id) {
+    public Archive findArchiveById(int id) {
         return ArchiveDao.findArchiveById(id);
     }
+
+    public boolean updateArchive(Archive archive) {
+        return ArchiveDao.updateArchive(archive);
+    }
+
+    public boolean addArchive(Archive archive) {
+        return ArchiveDao.addArchive(archive);
+    }
+
+    public void deleteById(Integer id) {
+        ArchiveDao.deleteById(id);
+    }
+
 }

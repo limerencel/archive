@@ -11,14 +11,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Archive {
-    @JSONField(serialize = false) // 前端不需要这个ID，设置为不序列化
     private int id;
-    @JSONField(name = "id") // 前端需要id而这里叫做archiveCode，
     private String archiveCode;
     private String title;
     private String category;
     private Integer status;
     private String uploader;
+
+    private int userId;
 
     @JSONField(name = "date", format = "yyyy-MM-dd HH:mm:ss") // 前端要date并格式化时间
     private LocalDateTime createdDate;
