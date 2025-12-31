@@ -37,6 +37,7 @@ public class UploadServlet extends HttpServlet {
                 // 筛选出的确有内容的文件
                 if ("files".equals(part.getName()) && part.getSize() > 0) {
                     // 那就保存
+                    // construct
                     String fileName = UUID.randomUUID() + getSuffix(part.getSubmittedFileName());
                     part.write("D:/aki/crap/q/" + fileName);
 
