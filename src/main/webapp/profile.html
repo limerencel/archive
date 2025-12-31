@@ -151,7 +151,7 @@
             // 向后端查询数据
             $.ajax({
                 url: "/profile",
-                method: "GET",
+                type: "GET",
                 dataType: "json",
                 success: function(user) {
                     if (user.success === false) {
