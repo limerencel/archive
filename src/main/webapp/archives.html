@@ -408,50 +408,54 @@
             // 筛选表单提交
             $('#filterForm').submit(function(e) {
                 e.preventDefault();
+
+                // 准备筛选参数
                 const filters = {
-                    keyword: $('#filterKeyword').val().toLowerCase(),
+                    keyword: $('#filterKeyword').val(),
                     category: $('#filterCategory').val(),
                     status: $('#filterStatus').val(),
-                    uploader: $('#filterUploader').val().toLowerCase()
+                    uploader: $('#filterUploader').val()
                 };
 
-                // 过滤数据
-                let filteredData = allArchivesData.filter(archive => {
-                    let match = true;
-
-                    if (filters.keyword) {
-                        match = match && (
-                            archive.id.toLowerCase().includes(filters.keyword) ||
-                            archive.title.toLowerCase().includes(filters.keyword)
-                        );
+                // POST请求发送筛选条件到后端
+                $.ajax({
+                    url: "/archiveList",
+                    type: "POST",
+                    data: filters,
+                    dataType: "json",
+                    success: function(response) {
+                        allArchivesData = response; // 更新数据
+                        currentPage = 1; // 重置到第一页
+                        renderArchives(response);
+                        renderPagination(response.length);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        alert("筛选失败：" + error);
                     }
-
-                    if (filters.category) {
-                        match = match && archive.category === filters.category;
-                    }
-
-                    if (filters.status !== '') {
-                        match = match && archive.status == filters.status;
-                    }
-
-                    if (filters.uploader) {
-                        match = match && archive.uploader.toLowerCase().includes(filters.uploader);
-                    }
-
-                    return match;
                 });
-
-                currentPage = 1; // 重置到第一页
-                renderArchives(filteredData);
-                renderPagination(filteredData.length);
             });
 
             // 重置筛选
             $('#resetFilterBtn').click(function() {
                 $('#filterForm')[0].reset();
-                currentPage = 1;
-                renderArchives(allArchivesData);
-                renderPagination(allArchivesData.length);
+
+                // 重新加载所有数据
+                $.ajax({
+                    url: "/archiveList",
+                    type: "GET",
+                    dataType: "json",
+                    success: function(response) {
+                        allArchivesData = response;
+                        currentPage = 1;
+                        renderArchives(response);
+                        renderPagination(response.length);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        alert("重置失败：" + error);
+                    }
+                });
             });
 
             // 全选/取消全选

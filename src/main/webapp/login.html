@@ -118,22 +118,22 @@
                 const ctx = canvas.getContext('2d');
                 const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
                 let captcha = '';
-                
+
                 // 清空画布
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#f0f0f0';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
+
                 // 生成随机验证码
                 for (let i = 0; i < 4; i++) {
                     const char = chars.charAt(Math.floor(Math.random() * chars.length));
                     captcha += char;
-                    
+
                     ctx.font = '24px Arial';
                     ctx.fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
                     ctx.fillText(char, 20 + i * 25, 28);
                 }
-                
+
                 // 添加干扰线
                 for (let i = 0; i < 3; i++) {
                     ctx.strokeStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
@@ -142,29 +142,29 @@
                     ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
                     ctx.stroke();
                 }
-                
+
                 // 保存验证码
                 canvas.dataset.captcha = captcha;
             }
-            
+
             // 初始化验证码
             generateCaptcha();
-            
+
             // 点击验证码刷新
             $('#captchaCanvas').click(function() {
                 generateCaptcha();
             });
-            
+
             // 密码登录表单提交
             $('#passwordLoginForm').submit(function(e) {
                 e.preventDefault();
-                
+
                 const username = $('#username').val();
                 const password = $('#password').val();
                 const captcha = $('#captcha').val();
                 const realCaptcha = $('#captchaCanvas').data('captcha');
                 const rememberMe = $('#rememberMe').is(':checked');
-                
+
                 // 验证验证码
                 if (captcha.toLowerCase() !== realCaptcha.toLowerCase()) {
                     alert('验证码错误，请重新输入！');
@@ -196,52 +196,52 @@
                     }
                 })
             });
-            
+
             // 发送邮箱验证码
             let countdown = 0;
             $('#sendEmailCode').click(function() {
                 const email = $('#loginEmail').val();
-                
+
                 if (!email) {
                     alert('请先输入邮箱地址！');
                     return;
                 }
-                
+
                 // 验证邮箱格式
                 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailPattern.test(email)) {
                     alert('邮箱格式不正确！');
                     return;
                 }
-                
+
                 if (countdown > 0) {
                     return;
                 }
-                
+
                 // 模拟发送验证码
                 $(this).prop('disabled', true);
                 countdown = 60;
-                
+
                 const timer = setInterval(() => {
                     countdown--;
                     $('#sendEmailCode').text(countdown + '秒后重发');
-                    
+
                     if (countdown <= 0) {
                         clearInterval(timer);
                         $('#sendEmailCode').prop('disabled', false).text('发送验证码');
                     }
                 }, 1000);
-                
+
                 alert('验证码已发送到您的邮箱！（模拟）');
             });
-            
+
             // 邮箱验证码登录表单提交
             $('#emailLoginForm').submit(function(e) {
                 e.preventDefault();
-                
+
                 const email = $('#loginEmail').val();
                 const code = $('#emailCode').val();
-                
+
                 // 模拟验证（实际项目中应该发送到服务器验证）
                 if (email && code) {
                     alert('登录成功！');
