@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-public class userDao {
+public class UserDao {
     public static void register(User user) {
         String sql = "INSERT INTO user (username, name, password, email, number, gender, registered_date, status, pic, role) VALUES(?,?,?,?,?,?,?,?,?,?)";
         try (Connection conn = DataSourceUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -67,6 +67,24 @@ public class userDao {
             ps.setString(2, username);
 
             ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean updateUser(User loginUser) {
+        String sql = "UPDATE user SET name=?, email=?, number=?, gender=?, bio=? WHERE id=?";
+        try (Connection conn = DataSourceUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, loginUser.getName());
+            ps.setString(2, loginUser.getEmail());
+            ps.setString(3, loginUser.getNumber());
+            ps.setInt(4, loginUser.getGender());
+            ps.setString(5, loginUser.getBio());
+            ps.setInt(6, loginUser.getId());
+
+            int rows = ps.executeUpdate();
+
+            return rows > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

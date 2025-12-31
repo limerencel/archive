@@ -217,12 +217,23 @@
                     email: $('#profileEmail').val(),
                     phone: $('#profilePhone').val(),
                     gender: $('#profileGender').val(),
-                    dept: $('#profileDept').val(),
                     bio: $('#profileBio').val()
                 };
 
-                console.log('保存个人信息：', data);
-                alert('个人信息保存成功！');
+                $.ajax({
+                    url: "/profile",
+                    type: "POST",
+                    data: data,
+                    dataType: "json",
+                    success: function () {
+                        console.log('保存个人信息：', data);
+                        alert('个人信息保存成功！');
+                    },
+                    error: function (error) {
+                        alert(error.errorMsg);
+                    }
+                })
+
             });
 
 
