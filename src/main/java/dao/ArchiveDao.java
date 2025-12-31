@@ -108,7 +108,7 @@ public class ArchiveDao {
     }
 
     public static void deleteById(Integer id) {
-        String sql = "DELETE FROM archive WHERE id = ";
+        String sql = "DELETE FROM archive WHERE id = ?";
         try (Connection conn = DataSourceUtil.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();

@@ -18,6 +18,5 @@ public class DeleteServlet extends HttpServlet {
 
         archiveService.deleteById(id);
 
-//        resp.getWriter().write("{\"success\": " + success + "}");
     }
 }
