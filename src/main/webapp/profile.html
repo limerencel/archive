@@ -70,7 +70,7 @@
                     </div>
                     <div class="mb-3">
                         <small class="text-muted">账户状态</small>
-                        <p class="mb-0"><span class="badge bg-success">正常</span></p>
+                        <p class="mb-0"><span class="badge bg-success" id="userStatus">正常</span></p>
                     </div>
                 </div>
             </div>
@@ -145,9 +145,54 @@
     <script src="./js/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap JS -->
     <script src="./js/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         $(document).ready(function() {
+            // 向后端查询数据
+            $.ajax({
+                url: "/profile",
+                method: "GET",
+                dataType: "json",
+                success: function(user) {
+                    if (user.success === false) {
+                        // 如果后端说没登录，踢回登录页
+                        alert("请先登录！");
+                        window.location.href = "login.html";
+                        return;
+                    }
+
+                    // 2. 拿到数据，开始填空
+
+                    statusMap = {
+                        1: "正常",
+                        0: "禁用"
+                    }
+
+                    // --- 填左侧小卡片 ---
+                    $('#userName').text(user.name); // 用户名
+                    $('#userRole').text(user.role === 1 ? "管理员" : "普通职员");
+                    $('#regTime').text(user.registeredDate);
+                    $('#lastLogin').text(user.lastLoginDate || "刚刚");
+                    $('#userStatus').text(statusMap[user.status])
+
+                    // --- 填右侧表单 ---
+                    // 注意：input 框用 .val()，普通文本用 .text()
+                    $('#profileUsername').val(user.username);
+                    $('#profileRealName').val(user.name);     // 真实姓名
+                    $('#profileEmail').val(user.email);
+                    $('#profilePhone').val(user.number);
+
+                    // 下拉框赋值：只要 value 对应（比如 "1" 代表男），jQuery 会自动选中
+                    $('#profileGender').val(user.gender);
+
+                    // 文本域
+                    $('#profileBio').val(user.bio || ""); // 防止 null 显示出来
+                },
+                error: function() {
+                    console.error("无法获取用户信息");
+                }
+            })
+
             // 退出登录
             $('#logoutBtn').click(function() {
                 if (confirm('确定要退出登录吗？')) {
@@ -166,7 +211,7 @@
             // 保存个人信息
             $('#profileForm').submit(function(e) {
                 e.preventDefault();
-                
+
                 const data = {
                     realName: $('#profileRealName').val(),
                     email: $('#profileEmail').val(),
@@ -175,7 +220,7 @@
                     dept: $('#profileDept').val(),
                     bio: $('#profileBio').val()
                 };
-                
+
                 console.log('保存个人信息：', data);
                 alert('个人信息保存成功！');
             });
