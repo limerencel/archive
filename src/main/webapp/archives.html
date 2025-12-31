@@ -293,7 +293,6 @@
 
                 let html = '';
                 pageData.forEach(archive => {
-                    // 修复：直接使用英文的category值进行映射
                     const categoryName = categoryTextMap[archive.category] || archive.category;
                     const status = statusMap[archive.status];
 
@@ -390,7 +389,19 @@
             // 退出登录
             $('#logoutBtn').click(function() {
                 if (confirm('确定要退出登录吗？')) {
-                    window.location.href = 'login.html';
+                    $.ajax({
+                        url: "/logout",
+                        type: "GET",
+                        dataType: "json",
+                        success: function () {
+                            alert("退出登录成功")
+                            window.location.href = "/login.html"
+                        },
+                        error: function () {
+                            window.location.href = 'login.html';
+                        }
+
+                    })
                 }
             });
 
