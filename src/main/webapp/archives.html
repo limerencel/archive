@@ -248,20 +248,24 @@
     <script>
 
         $(document).ready(function() {
-            //TODO 在这里直接GET从后端拿到JSON的档案数据，path为/archiveList
+            let allArchivesData = []; // 存储所有数据
+            let currentPage = 1;
+            let pageSize = 8; // 每页显示8条
+
+            // 初始化加载数据
             $.ajax({
                 url: "/archiveList",
                 type: "GET",
                 dataType: "json",
                 success: function(response) {
-                    // response已经是解析好的js Object了
-                    // 初始化加载数据
+                    allArchivesData = response;
                     renderArchives(response);
+                    renderPagination(response.length);
                 },
                 error: function (error) {
-                    alert(error)
+                    alert("加载数据失败：" + error);
                 }
-            })
+            });
 
             // 状态颜色映射
             const statusMap = {
@@ -271,28 +275,26 @@
                 3: { text: '已归档', class: 'info' }
             };
 
-            // 等级颜色映射
-            const levelMap = {
-                'high': { text: '高', class: 'danger' },
-                'medium': { text: '中', class: 'warning' },
-                'low': { text: '低', class: 'info' }
+            // 分类文本映射
+            const categoryTextMap = {
+                'personnel': '人事档案',
+                'financial': '财务档案',
+                'contract': '合同档案',
+                'project': '项目档案',
+                'other': '其他档案'
             };
 
-            // 渲染档案列表
+            // 渲染档案列表（支持分页）
             function renderArchives(data) {
+                // 计算当前页数据
+                const start = (currentPage - 1) * pageSize;
+                const end = start + pageSize;
+                const pageData = data.slice(start, end);
+
                 let html = '';
-                const categoryTextMap = {
-                    'personnel': '人事档案',
-                    'financial': '财务档案',
-                    'contract': '合同档案',
-                    'project': '项目档案',
-                    'other': '其他档案'
-                };
-                data.forEach(archive => {
-                    // category name
+                pageData.forEach(archive => {
+                    // 修复：直接使用英文的category值进行映射
                     const categoryName = categoryTextMap[archive.category] || archive.category;
-
-
                     const status = statusMap[archive.status];
 
                     // 生成文件列表HTML
@@ -300,39 +302,90 @@
                     if (archive.files && archive.files.length > 0) {
                         filesHtml = `<span class="badge bg-secondary">${archive.files.length}个文件</span> `;
                         filesHtml += `<button class="btn btn-sm btn-link p-0" onclick="showFiles('${archive.id}')" title="查看文件列表">
-                            <i class="bi bi-folder2-open"></i>
-                        </button>`;
+                    <i class="bi bi-folder2-open"></i>
+                </button>`;
                     } else {
                         filesHtml = '<span class="text-muted">无</span>';
                     }
 
                     html += `
-                        <tr>
-                            <td><input type="checkbox" class="archive-checkbox" value="${archive.id}"></td>
-                            <td><strong>${archive.id}</strong></td>
-                            <td>${archive.title}</td>
-                            <td><span class="badge bg-primary">${categoryName}</span></td>
-                            <td><span class="badge bg-${status.class}">${status.text}</span></td>
-                            <td>${filesHtml}</td>
-                            <td>${archive.uploader}</td>
-                            <td>${archive.date}</td>
-                            <td>
-                                <button class="btn btn-sm btn-info view-btn" data-id="${archive.id}">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-warning edit-btn" data-id="${archive.id}">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger delete-btn" data-id="${archive.id}">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+                <tr>
+                    <td><input type="checkbox" class="archive-checkbox" value="${archive.id}"></td>
+                    <td><strong>${archive.id}</strong></td>
+                    <td>${archive.title}</td>
+                    <td><span class="badge bg-primary">${categoryName}</span></td>
+                    <td><span class="badge bg-${status.class}">${status.text}</span></td>
+                    <td>${filesHtml}</td>
+                    <td>${archive.uploader}</td>
+                    <td>${archive.date}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info view-btn" data-id="${archive.id}">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning edit-btn" data-id="${archive.id}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${archive.id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
                 });
-                $('#archivesList').html(html);
+
+                $('#archivesList').html(html || '<tr><td colspan="9" class="text-center text-muted">暂无数据</td></tr>');
             }
 
+            // 渲染分页
+            function renderPagination(totalCount) {
+                const totalPages = Math.ceil(totalCount / pageSize);
+                let html = '';
+
+                // 上一页
+                html += `
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${currentPage - 1}">上一页</a>
+            </li>
+        `;
+
+                // 页码
+                for (let i = 1; i <= totalPages; i++) {
+                    // 只显示当前页前后2页
+                    if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                        html += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${i}">${i}</a>
+                    </li>
+                `;
+                    } else if (i === currentPage - 3 || i === currentPage + 3) {
+                        html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                    }
+                }
+
+                // 下一页
+                html += `
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${currentPage + 1}">下一页</a>
+            </li>
+        `;
+
+                $('#pagination').html(html);
+            }
+
+            // 分页点击事件
+            $(document).on('click', '#pagination .page-link', function(e) {
+                e.preventDefault();
+                const page = parseInt($(this).data('page'));
+
+                if (!isNaN(page) && page > 0 && page <= Math.ceil(allArchivesData.length / pageSize)) {
+                    currentPage = page;
+                    renderArchives(allArchivesData);
+                    renderPagination(allArchivesData.length);
+
+                    // 滚动到顶部
+                    $('html, body').animate({ scrollTop: 0 }, 300);
+                }
+            });
 
             // 退出登录
             $('#logoutBtn').click(function() {
@@ -346,6 +399,9 @@
                 $('#archiveModalLabel').text('新建档案');
                 $('#archiveForm')[0].reset();
                 $('#archiveId').val('');
+                // 启用所有表单字段
+                $('#archiveForm input, #archiveForm select, #archiveForm textarea').prop('disabled', false);
+                $('#saveArchiveBtn').show();
                 $('#archiveModal').modal('show');
             });
 
@@ -353,20 +409,49 @@
             $('#filterForm').submit(function(e) {
                 e.preventDefault();
                 const filters = {
-                    keyword: $('#filterKeyword').val(),
+                    keyword: $('#filterKeyword').val().toLowerCase(),
                     category: $('#filterCategory').val(),
                     status: $('#filterStatus').val(),
-                    uploader: $('#filterUploader').val()
+                    uploader: $('#filterUploader').val().toLowerCase()
                 };
-                
-                console.log('筛选条件：', filters);
-                alert('执行筛选操作（实际项目中会根据条件过滤数据）');
+
+                // 过滤数据
+                let filteredData = allArchivesData.filter(archive => {
+                    let match = true;
+
+                    if (filters.keyword) {
+                        match = match && (
+                            archive.id.toLowerCase().includes(filters.keyword) ||
+                            archive.title.toLowerCase().includes(filters.keyword)
+                        );
+                    }
+
+                    if (filters.category) {
+                        match = match && archive.category === filters.category;
+                    }
+
+                    if (filters.status !== '') {
+                        match = match && archive.status == filters.status;
+                    }
+
+                    if (filters.uploader) {
+                        match = match && archive.uploader.toLowerCase().includes(filters.uploader);
+                    }
+
+                    return match;
+                });
+
+                currentPage = 1; // 重置到第一页
+                renderArchives(filteredData);
+                renderPagination(filteredData.length);
             });
 
             // 重置筛选
             $('#resetFilterBtn').click(function() {
                 $('#filterForm')[0].reset();
-                renderArchives(archivesData);
+                currentPage = 1;
+                renderArchives(allArchivesData);
+                renderPagination(allArchivesData.length);
             });
 
             // 全选/取消全选
@@ -377,7 +462,6 @@
             // 查看档案详情
             $(document).on('click', '.view-btn', function() {
                 const id = $(this).data('id');
-                //TODO 再次GET by ID获得单个archive，path为/archiveDetail，其中GET为获取并渲染数据，POST为修改数据后提交
 
                 $.ajax({
                     url: "/archiveDetail",
@@ -387,12 +471,16 @@
                     success: function (archive) {
                         // 填充表单数据
                         $('#archiveId').val(archive.id);
-                        $('#archiveCode').val(archive.archiveCode).prop('disabled', true);
-                        $('#archiveTitle').val(archive.title).prop('disabled', true);
-                        $('#archiveCategory').val(archive.category).prop('disabled', true);
-                        $('#archiveStatus').val(archive.status).prop('disabled', true);
-                        $('#archiveUploader').val(archive.uploader).prop('disabled', true);
-                        $('#archiveDescription').val('这是' + archive.title + '的详细描述信息...').prop('disabled', true);
+                        $('#archiveCode').val(archive.archiveCode);
+                        $('#archiveTitle').val(archive.title);
+                        // 修复：直接使用英文的category值
+                        $('#archiveCategory').val(archive.category);
+                        $('#archiveStatus').val(archive.status);
+                        $('#archiveUploader').val(archive.uploader);
+                        $('#archiveDescription').val('这是' + archive.title + '的详细描述信息...');
+
+                        // 禁用所有表单字段
+                        $('#archiveForm input, #archiveForm select, #archiveForm textarea').prop('disabled', true);
 
                         $('#archiveModalLabel').text('查看档案详情');
                         $('#saveArchiveBtn').hide();
@@ -402,7 +490,7 @@
                         console.error(error);
                         alert("获取档案详情失败！");
                     }
-                })
+                });
             });
 
             // 编辑档案
@@ -417,12 +505,16 @@
                     success: function (archive) {
                         // 填充表单数据
                         $('#archiveId').val(archive.id);
-                        $('#archiveCode').val(archive.archiveCode).prop('disabled', false);
-                        $('#archiveTitle').val(archive.title).prop('disabled', false);
-                        $('#archiveCategory').val(getCategoryValue(archive.category)).prop('disabled', false);
-                        $('#archiveStatus').val(archive.status).prop('disabled', false);
-                        $('#archiveUploader').val(archive.uploader).prop('disabled', false);
-                        $('#archiveDescription').val('这是' + archive.title + '的详细描述信息...').prop('disabled', false);
+                        $('#archiveCode').val(archive.archiveCode);
+                        $('#archiveTitle').val(archive.title);
+                        // 修复：直接使用英文的category值，不需要转换
+                        $('#archiveCategory').val(archive.category);
+                        $('#archiveStatus').val(archive.status);
+                        $('#archiveUploader').val(archive.uploader);
+                        $('#archiveDescription').val('这是' + archive.title + '的详细描述信息...');
+
+                        // 启用所有表单字段
+                        $('#archiveForm input, #archiveForm select, #archiveForm textarea').prop('disabled', false);
 
                         $('#archiveModalLabel').text('编辑档案');
                         $('#saveArchiveBtn').show();
@@ -432,27 +524,15 @@
                         console.error(error);
                         alert("获取档案详情失败！");
                     }
-                })
+                });
             });
-
-            // 获取分类对应的值
-            function getCategoryValue(categoryName) {
-                const categoryMap = {
-                    '人事档案': 'personnel',
-                    '财务档案': 'financial',
-                    '合同档案': 'contract',
-                    '项目档案': 'project',
-                    '其他档案': 'other'
-                };
-                return categoryMap[categoryName] || '';
-            }
 
             // 保存档案
             $('#archiveForm').submit(function(e) {
                 e.preventDefault();
 
                 const formData = {
-                    id: $('#archiveId').val(), // archive_code
+                    id: $('#archiveId').val(),
                     code: $('#archiveCode').val(),
                     title: $('#archiveTitle').val(),
                     category: $('#archiveCategory').val(),
@@ -464,19 +544,18 @@
                 $.ajax({
                     url: "/archiveDetail",
                     type: "POST",
-                    data: formData, //不管archiveId有没有直接往后端传，后端再判断是新增还是修改
+                    data: formData,
                     dataType: "json",
                     success: function (response) {
-                        alert("成功")
+                        alert("保存成功");
+                        $('#archiveModal').modal('hide');
+                        location.reload();
                     },
                     error: function(xhr, status, error) {
                         console.error(error);
-                        alert("获取档案详情失败！");
+                        alert("保存失败！");
                     }
-                })
-                location.reload();
-                
-                $('#archiveModal').modal('hide');
+                });
             });
 
             // 删除档案
@@ -486,16 +565,16 @@
                     $.ajax({
                         url: "/delete",
                         type: "GET",
-                        data: id,
+                        data: {id: id},
                         success: function () {
-                            alert("删除成功")
+                            alert("删除成功");
+                            location.reload();
                         },
                         error: function(xhr, status, error) {
                             console.error(error);
-                            alert("something went wrong");
+                            alert("删除失败");
                         }
-                    })
-                    $(this).closest('tr').fadeOut();
+                    });
                 }
             });
 
@@ -510,19 +589,15 @@
                 $(this).addClass('active');
                 $('#gridViewBtn').removeClass('active');
             });
-            
+
             // 显示文件列表
             window.showFiles = function(archiveId) {
-                const archive = archivesData.find(a => a.id === archiveId);
+                const archive = allArchivesData.find(a => a.id === archiveId);
                 if (archive && archive.files) {
-                    let fileList = archive.files.map((file, index) => 
+                    let fileList = archive.files.map((file, index) =>
                         `${index + 1}. ${file}`
                     ).join('\n');
-                    alert(`档案编号：${archive.id}
-档案标题：${archive.title}
-
-文件列表：
-${fileList}`);
+                    alert(`档案编号：${archive.id}\n档案标题：${archive.title}\n\n文件列表：\n${fileList}`);
                 }
             };
         });
